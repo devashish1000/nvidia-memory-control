@@ -193,7 +193,7 @@ export async function seedDatabase(): Promise<SeedSummary> {
     await db.from(t).delete().neq("id", "00000000-0000-0000-0000-000000000000");
   }
 
-  const insertRet = async <T,>(table: string, rows: T[]) => {
+  const insertRet = async <T,>(table: string, rows: T[]): Promise<any[]> => {
     const { data, error } = await db.from(table).insert(rows as never).select();
     if (error) throw new Error(`${table}: ${error.message}`);
     return data ?? [];
