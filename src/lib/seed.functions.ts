@@ -17,7 +17,8 @@ export const getSeedStatus = createServerFn({ method: "GET" }).handler(async () 
   ];
   const counts: Record<string, number> = {};
   for (const t of tables) {
-    const { count } = await db.from(t).select("*", { count: "exact", head: true });
+    const { count, error } = await db.from(t).select("*", { count: "exact", head: true });
+    if (error) throw error;
     counts[t] = count ?? 0;
   }
   return { counts, isSeeded: (counts.product_families ?? 0) > 0 };

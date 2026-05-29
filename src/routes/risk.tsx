@@ -93,9 +93,10 @@ function RiskPage() {
                 <div className="text-xs font-mono text-muted-foreground mb-1">SEVERITY MIX</div>
                 <div className="text-base font-semibold mb-4">Open and active events</div>
                 <div className="space-y-3 mt-4">
-                  {["critical", "high", "medium", "low"].map((s) => {
+                  {(() => {
+                    const max = Math.max(0, ...Object.values(data.severityCounts).map((n) => Number(n) || 0));
+                    return ["critical", "high", "medium", "low"].map((s) => {
                     const count = data.severityCounts[s] ?? 0;
-                    const max = Math.max(...Object.values(data.severityCounts).map((n) => Number(n)));
                     const pct = max ? (count / max) * 100 : 0;
                     return (
                       <div key={s}>
@@ -111,7 +112,8 @@ function RiskPage() {
                         </div>
                       </div>
                     );
-                  })}
+                  });
+                  })()}
                 </div>
               </div>
             </div>

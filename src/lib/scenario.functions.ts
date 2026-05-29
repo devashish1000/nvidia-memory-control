@@ -7,23 +7,26 @@ import { runScenarioEngine } from "./scenario.server";
 const db: any = supabaseAdmin;
 
 export const listScenarioTemplates = createServerFn({ method: "GET" }).handler(async () => {
-  const { data } = await db.from("scenario_templates").select("*").order("sort_order");
+  const { data, error } = await db.from("scenario_templates").select("*").order("sort_order");
+  if (error) throw error;
   return data ?? [];
 });
 
 export const listScenarioSimulations = createServerFn({ method: "GET" }).handler(async () => {
-  const { data: sims } = await db
+  const { data: sims, error: simsErr } = await db
     .from("scenario_simulations")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(20);
+  if (simsErr) throw simsErr;
   if (!sims?.length) return [];
   const ids = sims.map((s: any) => s.id);
-  const { data: tls } = await db
+  const { data: tls, error: tlsErr } = await db
     .from("scenario_timeline_points")
     .select("*")
     .in("simulation_id", ids)
     .order("sort_order");
+  if (tlsErr) throw tlsErr;
   const byId: Record<string, any[]> = {};
   for (const t of tls ?? []) (byId[t.simulation_id] ??= []).push(t);
   return sims.map((s: any) => ({ ...s, timeline: byId[s.id] ?? [] }));

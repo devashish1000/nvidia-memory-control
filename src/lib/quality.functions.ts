@@ -87,6 +87,19 @@ async function runDataIntegrityTests(): Promise<TestResult[]> {
     db.from("supplier_allocations").select("allocation_percent,product_family_id,fiscal_period_id"),
   ]);
 
+  // A QUERY error is not a data-quality problem — surface it as a distinct failed
+  // result ("query error") so the QA signal isn't conflated with real data issues.
+  const queries: Record<string, { error: unknown }> = {
+    product_families: families, memory_technologies: techs, suppliers, fiscal_periods: periods,
+    supplier_capacity: capacity, demand_forecasts: forecasts, inventory, supplier_allocations: allocs,
+  };
+  for (const [table, res] of Object.entries(queries)) {
+    if (res.error) {
+      r.push({ suite: "query", name: `query error: ${table}`, passed: false, detail: `query failed: ${(res.error as any)?.message ?? String(res.error)}` });
+    }
+  }
+  if (r.length) return r;
+
   const F = families.data ?? [], T = techs.data ?? [], S = suppliers.data ?? [], P = periods.data ?? [];
   const C = capacity.data ?? [], FC = forecasts.data ?? [], IN = inventory.data ?? [], A = allocs.data ?? [];
 
@@ -144,7 +157,8 @@ export const runAllTests = createServerFn({ method: "POST" }).handler(async () =
 });
 
 export const getLatestTestRun = createServerFn({ method: "GET" }).handler(async () => {
-  const { data } = await db.from("test_runs").select("*").order("ran_at", { ascending: false }).limit(1);
+  const { data, error } = await db.from("test_runs").select("*").order("ran_at", { ascending: false }).limit(1);
+  if (error) throw error;
   return data?.[0] ?? null;
 });
 
@@ -164,6 +178,11 @@ export const getDataQualityReport = createServerFn({ method: "GET" }).handler(as
     db.from("risk_events").select("severity,status,revenue_at_risk"),
     db.from("purchase_orders").select("quantity,status,expected_arrival_date"),
   ]);
+
+  // A query failure must not masquerade as a clean/healthy report — surface it.
+  for (const res of [families, techs, suppliers, capacity, forecasts, inventory, allocs, risks, pos]) {
+    if (res.error) throw res.error;
+  }
 
   const F = families.data ?? [], T = techs.data ?? [], S = suppliers.data ?? [];
   const C = capacity.data ?? [], FC = forecasts.data ?? [], IN = inventory.data ?? [];

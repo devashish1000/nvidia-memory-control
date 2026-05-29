@@ -55,7 +55,9 @@ function Copilot() {
     const next: Msg[] = [...messages, { role: "user", content: t }];
     setMessages(next);
     setInput("");
-    mut.mutate(next.filter((m) => m.role === "user" || m.role === "assistant"));
+    // Exclude the seed canned greeting (messages[0]) from the conversation
+    // history sent to the backend; keep it visible in the UI only.
+    mut.mutate(next.slice(1));
   };
 
   return (

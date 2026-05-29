@@ -338,17 +338,28 @@ export async function seedDatabase(): Promise<SeedSummary> {
     const eligibleSups = suppliers.filter(
       (s) => s.supplier_type === "Advanced Memory" || s.supplier_type === "Strategic" || s.supplier_type === "Commodity Memory"
     );
-    let remaining = 100;
     const selected = eligibleSups.slice(0, intRange(2, 4));
+    const weights = selected.map(() => range(15, 50));
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let allocated = 0;
     selected.forEach((sup, idx) => {
       const tech = pick(techs);
-      const pct = idx === selected.length - 1 ? remaining : Math.round(range(15, 50));
-      remaining -= pct;
+      let pct: number;
+      if (idx === selected.length - 1) {
+        // Last supplier takes the remainder so the family sums to exactly 100.
+        pct = 100 - allocated;
+      } else {
+        // Normalize each share to an integer, leaving room (>=1) for the rest.
+        pct = Math.round((weights[idx] / totalWeight) * 100);
+        const minForRest = selected.length - 1 - idx; // at least 1 each for remaining suppliers
+        pct = Math.max(1, Math.min(pct, 100 - allocated - minForRest));
+        allocated += pct;
+      }
       allocRows.push({
         supplier_id: sup.id,
         product_family_id: family.id,
         memory_technology_id: tech.id,
-        allocation_percent: Math.max(0, pct),
+        allocation_percent: pct,
         fiscal_period_id: futureMonths[0].id,
       });
     });

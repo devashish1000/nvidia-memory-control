@@ -75,6 +75,10 @@ async function loadAll() {
       db.from("purchase_orders").select("*").limit(2000),
       db.from("supplier_allocations").select("*").limit(2000),
     ]);
+  // Surface any query failure instead of silently treating it as an empty dataset.
+  for (const r of [families, techs, suppliers, regions, segments, forecasts, capacity, inventory, pos, allocs]) {
+    if (r.error) throw r.error;
+  }
   return {
     families: families.data ?? [],
     techs: techs.data ?? [],

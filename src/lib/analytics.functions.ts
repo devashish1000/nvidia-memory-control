@@ -92,7 +92,12 @@ export const getDashboardSnapshot = createServerFn({ method: "GET" }).handler(as
   }
 
   const openShortages = core.risks.filter((r: any) => r.status === "open").length;
-  const avgWeeklyDemand = totalDemand / 36 / 4.3; // 36 months
+  // Derive the number of monthly periods actually covered by the forecast data
+  // instead of assuming a fixed 36-month horizon. Guard against a 0 divisor.
+  const monthlyPeriodCount = core.periods.filter((p: any) => p.period_type === "month").length;
+  const WEEKS_PER_MONTH = 4.3;
+  const demandMonths = Math.max(1, monthlyPeriodCount);
+  const avgWeeklyDemand = totalDemand / demandMonths / WEEKS_PER_MONTH;
   const coverageWeeks = weeksOfSupply(totalInventory, avgWeeklyDemand);
 
   // Supplier concentration across allocations
@@ -107,13 +112,20 @@ export const getDashboardSnapshot = createServerFn({ method: "GET" }).handler(as
     core.forecasts.reduce((s: number, f: any) => s + num(f.forecast_confidence), 0) /
     Math.max(1, core.forecasts.length);
 
-  // Purchase readiness — % of techs with sufficient open POs to cover shortage
-  const techsWithShortage = Object.values(byTech).filter((b) => b.shortage > 0);
+  // Purchase readiness — % of techs with sufficient open POs to cover shortage.
+  // row.shortage is the NET (post-PO) shortage from projectedShortage(), so we
+  // compare open POs against the GROSS (pre-PO) shortage to avoid crediting the
+  // same POs twice. We iterate by tech id directly rather than reverse-mapping
+  // by object identity.
+  const techEntriesWithShortage = Object.entries(byTech).filter(([, b]) => b.shortage > 0);
   const purchaseReadiness =
-    techsWithShortage.length === 0
+    techEntriesWithShortage.length === 0
       ? 1
-      : techsWithShortage.filter((b) => (openPosByTech[Object.keys(byTech).find((k) => byTech[k] === b)!] ?? 0) > b.shortage * 0.5).length /
-        techsWithShortage.length;
+      : techEntriesWithShortage.filter(([id, b]) => {
+          const open = openPosByTech[id] ?? 0;
+          const grossShortage = b.shortage + open; // add POs back to get pre-PO shortage
+          return open > grossShortage * 0.5;
+        }).length / techEntriesWithShortage.length;
 
   const shortageRisk = totalDemand > 0 ? totalShortage / totalDemand : 0;
   const inventoryHealth = Math.min(1, coverageWeeks / 8);
@@ -273,9 +285,14 @@ export const getInventoryAnalytics = createServerFn({ method: "GET" }).handler(a
   const familyById = new Map(core.families.map((f: any) => [f.id, f]));
   const regionById = new Map(core.regions.map((r: any) => [r.id, r]));
 
-  // demand per tech (annualized → weekly)
+  // demand per tech (summed forecast → weekly)
   const demandByTech: Record<string, number> = {};
   for (const f of core.forecasts) demandByTech[f.memory_technology_id] = (demandByTech[f.memory_technology_id] ?? 0) + num(f.forecast_units);
+  // Number of monthly periods the forecast spans; used to convert total demand
+  // to a weekly rate. Guard against a 0 divisor.
+  const monthlyPeriodCount = core.periods.filter((p: any) => p.period_type === "month").length;
+  const WEEKS_PER_MONTH = 4.3;
+  const demandMonths = Math.max(1, monthlyPeriodCount);
 
   const rows = core.inventory.map((i: any) => {
     const tech: any = techById.get(i.memory_technology_id);
@@ -283,8 +300,8 @@ export const getInventoryAnalytics = createServerFn({ method: "GET" }).handler(a
     const reg: any = regionById.get(i.region_id);
     const inv = num(i.inventory_units);
     const safety = num(i.safety_stock_units);
-    const annualDemand = demandByTech[i.memory_technology_id] ?? 0;
-    const weekly = annualDemand / 36 / 4.3;
+    const totalTechDemand = demandByTech[i.memory_technology_id] ?? 0;
+    const weekly = totalTechDemand / demandMonths / WEEKS_PER_MONTH;
     const wos = weeksOfSupply(inv, weekly);
     return {
       tech: tech?.name ?? "—",
@@ -347,9 +364,12 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
     if (p.status === "open") openPosByTech[p.memory_technology_id] = (openPosByTech[p.memory_technology_id] ?? 0) + num(p.quantity);
   }
 
-  const horizon = 1 / 12; // 1 month of annualized demand
+  // Use full-period demand so all inputs (demand, safety, inventory, capacity,
+  // open POs) are expressed on the same horizon. Previously demand was scaled
+  // to one month while the other terms were full totals, which made the
+  // recommendation clamp to 0 almost always.
   const recommendations = core.techs.map((t: any) => {
-    const demand = (demandByTech[t.id] ?? 0) * horizon;
+    const demand = demandByTech[t.id] ?? 0;
     const safety = safetyByTech[t.id] ?? 0;
     const inv = invByTech[t.id] ?? 0;
     const cap = capByTech[t.id] ?? 0;
@@ -367,7 +387,7 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
     };
   }).sort((a: any, b: any) => b.recommend - a.recommend);
 
-  const openPos = core.pos.filter((p: any) => p.status === "open").map((p: any) => {
+  const allOpenPos = core.pos.filter((p: any) => p.status === "open").map((p: any) => {
     const sup: any = supplierById.get(p.supplier_id);
     const tech: any = techById.get(p.memory_technology_id);
     const fam: any = p.product_family_id ? familyById.get(p.product_family_id) : null;
@@ -379,17 +399,20 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
       expected: p.expected_arrival_date,
       expediteCost: num(p.expedite_cost),
     };
-  }).sort((a: any, b: any) => (a.expected < b.expected ? -1 : 1)).slice(0, 100);
+  }).sort((a: any, b: any) => (a.expected < b.expected ? -1 : 1));
 
-  const totalOpenValue = openPos.reduce((s: number, p: any) => s + p.quantity, 0);
-  const expediteSpend = openPos.reduce((s: number, p: any) => s + p.expediteCost, 0);
+  // Summary totals must cover ALL open POs to stay consistent with openPoCount,
+  // not just the displayed top-100 slice.
+  const totalOpenValue = allOpenPos.reduce((s: number, p: any) => s + p.quantity, 0);
+  const expediteSpend = allOpenPos.reduce((s: number, p: any) => s + p.expediteCost, 0);
+  const openPos = allOpenPos.slice(0, 100);
 
   return {
     seeded: true,
     recommendations,
     openPos,
     summary: {
-      openPoCount: core.pos.filter((p: any) => p.status === "open").length,
+      openPoCount: allOpenPos.length,
       totalOpenUnits: totalOpenValue,
       expediteSpend,
       recommendedUnits: recommendations.reduce((s: number, r: any) => s + r.recommend, 0),

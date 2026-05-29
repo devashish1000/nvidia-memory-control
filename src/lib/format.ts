@@ -13,6 +13,7 @@ export const fmtMoney = (n: number) =>
   }).format(n || 0);
 
 export const fmtPct = (n: number, digits = 0) =>
-  `${(n * 100).toFixed(digits)}%`;
+  `${((Number.isFinite(n) ? n : 0) * 100).toFixed(digits)}%`;
 
-export const fmtWeeks = (n: number) => `${n.toFixed(1)}w`;
+export const fmtWeeks = (n: number) =>
+  `${(Number.isFinite(n) ? n : 0).toFixed(1)}w`;
