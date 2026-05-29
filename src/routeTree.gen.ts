@@ -16,6 +16,7 @@ import { Route as PurchasingRouteImport } from './routes/purchasing'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastRouteImport } from './routes/forecast'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as CaseStudyRouteImport } from './routes/case-study'
 import { Route as CapacityRouteImport } from './routes/capacity'
 import { Route as IndexRouteImport } from './routes/index'
@@ -55,6 +56,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CopilotRoute = CopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CaseStudyRoute = CaseStudyRouteImport.update({
   id: '/case-study',
   path: '/case-study',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CapacityRoute: typeof CapacityRoute
   CaseStudyRoute: typeof CaseStudyRoute
+  CopilotRoute: typeof CopilotRoute
   DashboardRoute: typeof DashboardRoute
   ForecastRoute: typeof ForecastRoute
   InventoryRoute: typeof InventoryRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/copilot': {
+      id: '/copilot'
+      path: '/copilot'
+      fullPath: '/copilot'
+      preLoaderRoute: typeof CopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/case-study': {
       id: '/case-study'
       path: '/case-study'
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CapacityRoute: CapacityRoute,
   CaseStudyRoute: CaseStudyRoute,
+  CopilotRoute: CopilotRoute,
   DashboardRoute: DashboardRoute,
   ForecastRoute: ForecastRoute,
   InventoryRoute: InventoryRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
