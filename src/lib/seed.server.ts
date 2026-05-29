@@ -191,11 +191,11 @@ export async function seedDatabase(): Promise<SeedSummary> {
     "customer_segments", "suppliers", "memory_technologies", "product_families",
   ];
   for (const t of clear) {
-    await supabaseAdmin.from(t).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    await db.from(t).delete().neq("id", "00000000-0000-0000-0000-000000000000");
   }
 
   const insertRet = async <T,>(table: string, rows: T[]) => {
-    const { data, error } = await supabaseAdmin.from(table).insert(rows as never).select();
+    const { data, error } = await db.from(table).insert(rows as never).select();
     if (error) throw new Error(`${table}: ${error.message}`);
     return data ?? [];
   };
@@ -457,7 +457,7 @@ export async function seedDatabase(): Promise<SeedSummary> {
 async function insertChunks(table: string, rows: Array<Record<string, unknown>>, chunkSize: number) {
   for (let i = 0; i < rows.length; i += chunkSize) {
     const slice = rows.slice(i, i + chunkSize);
-    const { error } = await supabaseAdmin.from(table).insert(slice as never);
+    const { error } = await db.from(table).insert(slice as never);
     if (error) throw new Error(`${table} chunk ${i}: ${error.message}`);
   }
 }
