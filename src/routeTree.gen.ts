@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WarRoomRouteImport } from './routes/war-room'
 import { Route as TwinRouteImport } from './routes/twin'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as RiskRouteImport } from './routes/risk'
@@ -21,6 +22,11 @@ import { Route as CaseStudyRouteImport } from './routes/case-study'
 import { Route as CapacityRouteImport } from './routes/capacity'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WarRoomRoute = WarRoomRouteImport.update({
+  id: '/war-room',
+  path: '/war-room',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TwinRoute = TwinRouteImport.update({
   id: '/twin',
   path: '/twin',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,10 +183,18 @@ export interface RootRouteChildren {
   RiskRoute: typeof RiskRoute
   ScenariosRoute: typeof ScenariosRoute
   TwinRoute: typeof TwinRoute
+  WarRoomRoute: typeof WarRoomRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/war-room': {
+      id: '/war-room'
+      path: '/war-room'
+      fullPath: '/war-room'
+      preLoaderRoute: typeof WarRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/twin': {
       id: '/twin'
       path: '/twin'
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   RiskRoute: RiskRoute,
   ScenariosRoute: ScenariosRoute,
   TwinRoute: TwinRoute,
+  WarRoomRoute: WarRoomRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
