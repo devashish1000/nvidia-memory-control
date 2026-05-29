@@ -80,14 +80,15 @@ function WarRoom() {
             </motion.div>
 
             <div className="grid grid-cols-4 gap-4 mb-8">
-              <KpiTile label="Planning Intelligence" value={`${s.pis.total}`} sub="/ 100" tone="primary" />
+              <KpiTile label="Planning Intelligence" value={`${s.pis.score}`} sub="/ 100" tone="primary" />
               <KpiTile label="Revenue at Risk" value={fmtMoney(s.kpis.revenueAtRisk)} tone="destructive" />
               <KpiTile label="Open Shortages" value={fmtInt(s.kpis.openShortages)} tone="warning" />
               <KpiTile label="Coverage" value={fmtWeeks(s.kpis.coverageWeeks)} sub={`target ${s.kpis.coverageTargetWeeks}w`} />
               <KpiTile label="Supplier Risk Index" value={`${s.kpis.supplierRiskIndex}`} sub="/ 100" />
               <KpiTile label="Watch Suppliers" value={fmtInt(s.kpis.watchSuppliers)} />
-              <KpiTile label="Forecast Confidence" value={`${Math.round(s.pis.subs.forecastConfidence * 100)}%`} />
-              <KpiTile label="Purchase Readiness" value={`${Math.round(s.pis.subs.purchaseReadiness * 100)}%`} />
+              <KpiTile label="Forecast Confidence" value={`${s.pis.subScores.confidence}%`} />
+              <KpiTile label="Purchase Readiness" value={`${s.pis.subScores.purchasing}%`} />
+
             </div>
 
             <div className="grid grid-cols-2 gap-6">
