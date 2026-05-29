@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WarRoomRouteImport } from './routes/war-room'
 import { Route as TwinRouteImport } from './routes/twin'
+import { Route as TestsRouteImport } from './routes/tests'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as RiskRouteImport } from './routes/risk'
 import { Route as PurchasingRouteImport } from './routes/purchasing'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastRouteImport } from './routes/forecast'
+import { Route as DataQualityRouteImport } from './routes/data-quality'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as CaseStudyRouteImport } from './routes/case-study'
@@ -31,6 +33,11 @@ const WarRoomRoute = WarRoomRouteImport.update({
 const TwinRoute = TwinRouteImport.update({
   id: '/twin',
   path: '/twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestsRoute = TestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScenariosRoute = ScenariosRouteImport.update({
@@ -56,6 +63,11 @@ const InventoryRoute = InventoryRouteImport.update({
 const ForecastRoute = ForecastRouteImport.update({
   id: '/forecast',
   path: '/forecast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataQualityRoute = DataQualityRouteImport.update({
+  id: '/data-quality',
+  path: '/data-quality',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -96,11 +108,13 @@ export interface FileRoutesByFullPath {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -111,11 +125,13 @@ export interface FileRoutesByTo {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -127,11 +143,13 @@ export interface FileRoutesById {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -144,11 +162,13 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   fileRoutesByTo: FileRoutesByTo
@@ -159,11 +179,13 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   id:
@@ -174,11 +196,13 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   fileRoutesById: FileRoutesById
@@ -190,11 +214,13 @@ export interface RootRouteChildren {
   CaseStudyRoute: typeof CaseStudyRoute
   CopilotRoute: typeof CopilotRoute
   DashboardRoute: typeof DashboardRoute
+  DataQualityRoute: typeof DataQualityRoute
   ForecastRoute: typeof ForecastRoute
   InventoryRoute: typeof InventoryRoute
   PurchasingRoute: typeof PurchasingRoute
   RiskRoute: typeof RiskRoute
   ScenariosRoute: typeof ScenariosRoute
+  TestsRoute: typeof TestsRoute
   TwinRoute: typeof TwinRoute
   WarRoomRoute: typeof WarRoomRoute
 }
@@ -213,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/twin'
       fullPath: '/twin'
       preLoaderRoute: typeof TwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tests': {
+      id: '/tests'
+      path: '/tests'
+      fullPath: '/tests'
+      preLoaderRoute: typeof TestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scenarios': {
@@ -248,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/forecast'
       fullPath: '/forecast'
       preLoaderRoute: typeof ForecastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-quality': {
+      id: '/data-quality'
+      path: '/data-quality'
+      fullPath: '/data-quality'
+      preLoaderRoute: typeof DataQualityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -302,11 +342,13 @@ const rootRouteChildren: RootRouteChildren = {
   CaseStudyRoute: CaseStudyRoute,
   CopilotRoute: CopilotRoute,
   DashboardRoute: DashboardRoute,
+  DataQualityRoute: DataQualityRoute,
   ForecastRoute: ForecastRoute,
   InventoryRoute: InventoryRoute,
   PurchasingRoute: PurchasingRoute,
   RiskRoute: RiskRoute,
   ScenariosRoute: ScenariosRoute,
+  TestsRoute: TestsRoute,
   TwinRoute: TwinRoute,
   WarRoomRoute: WarRoomRoute,
 }
