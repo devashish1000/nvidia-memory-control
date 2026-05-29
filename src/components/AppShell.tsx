@@ -74,12 +74,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         ))}
 
         <div className="mt-auto pt-6 px-2 text-[10px] font-mono text-muted-foreground">
-            LIVE · <ClientOnly fallback={<span>—</span>}><span>{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></ClientOnly>
-
+          <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            LIVE · {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            LIVE · <ClientOnly fallback={<span>—</span>}><span>{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></ClientOnly>
           </div>
         </div>
+
       </aside>
 
       <main className="flex-1 min-w-0">
