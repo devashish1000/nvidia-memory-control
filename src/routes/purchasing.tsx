@@ -65,7 +65,7 @@ function PurchasingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.recommendations.map((r) => (
+                    {data.recommendations.map((r: any) => (
                       <tr key={r.tech} className="border-t border-border">
                         <td className="py-2 font-medium">{r.tech}</td>
                         <td className="py-2 text-right tabular-nums">{fmtCompact(r.demand)}</td>
@@ -101,7 +101,7 @@ function PurchasingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.openPos.map((p, i) => (
+                    {data.openPos.map((p: any, i: number) => (
                       <tr key={i} className="border-t border-border">
                         <td className="py-2 font-medium">{p.supplier}</td>
                         <td className="py-2 text-muted-foreground">{p.tech}</td>

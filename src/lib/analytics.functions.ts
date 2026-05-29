@@ -314,7 +314,7 @@ export const getInventoryAnalytics = createServerFn({ method: "GET" }).handler(a
     avgWos: t.rows ? t.wosSum / t.rows : 0,
   })).sort((a, b) => b.inventory - a.inventory);
 
-  const statusCounts = rows.reduce((acc: Record<string, number>, r) => {
+  const statusCounts = rows.reduce((acc: Record<string, number>, r: any) => {
     acc[r.status] = (acc[r.status] ?? 0) + 1;
     return acc;
   }, {});
@@ -365,7 +365,7 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
       recommend,
       priority: recommend > demand * 0.3 ? "high" : recommend > 0 ? "medium" : "low",
     };
-  }).sort((a, b) => b.recommend - a.recommend);
+  }).sort((a: any, b: any) => b.recommend - a.recommend);
 
   const openPos = core.pos.filter((p: any) => p.status === "open").map((p: any) => {
     const sup: any = supplierById.get(p.supplier_id);
@@ -392,7 +392,7 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
       openPoCount: core.pos.filter((p: any) => p.status === "open").length,
       totalOpenUnits: totalOpenValue,
       expediteSpend,
-      recommendedUnits: recommendations.reduce((s, r) => s + r.recommend, 0),
+      recommendedUnits: recommendations.reduce((s: number, r: any) => s + r.recommend, 0),
     },
   } as const;
 });

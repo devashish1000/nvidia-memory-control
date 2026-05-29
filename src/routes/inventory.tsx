@@ -94,7 +94,7 @@ function InventoryPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.rows.map((r, i) => (
+                    {data.rows.map((r: any, i: number) => (
                       <tr key={i} className="border-t border-border">
                         <td className="py-2">{r.tech}</td>
                         <td className="py-2 text-muted-foreground">{r.family}</td>
