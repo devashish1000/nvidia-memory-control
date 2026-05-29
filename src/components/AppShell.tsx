@@ -19,10 +19,11 @@ const NAV = [
     { to: "/twin", label: "Digital Twin", icon: Cpu },
   ]},
   { group: "Intelligence", items: [
-    { to: "/copilot", label: "AI Copilot", icon: Sparkles, disabled: true },
-    { to: "/war-room", label: "Executive War Room", icon: Radio, disabled: true },
-    { to: "/boardroom", label: "Boardroom Mode", icon: Presentation, disabled: true },
+    { to: "/copilot", label: "AI Copilot", icon: Sparkles },
+    { to: "/war-room", label: "Executive War Room", icon: Radio },
+    { to: "/boardroom", label: "Boardroom Mode", icon: Presentation },
   ]},
+
   { group: "Operations", items: [
     { to: "/data-quality", label: "Data Quality", icon: Shield, disabled: true },
     { to: "/tests", label: "Test Center", icon: TestTube, disabled: true },
