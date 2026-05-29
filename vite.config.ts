@@ -6,10 +6,27 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// The Lovable config force-sets Nitro's output to dist/ regardless of preset.
+// Vercel's Build Output API needs output under .vercel/output, so when building
+// for Vercel (NITRO_PRESET=vercel) we restore the paths the vercel preset expects.
+const isVercel = process.env.NITRO_PRESET === "vercel";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  ...(isVercel
+    ? {
+        nitro: {
+          preset: "vercel",
+          output: {
+            dir: ".vercel/output",
+            serverDir: ".vercel/output/functions/__server.func",
+            publicDir: ".vercel/output/static",
+          },
+        },
+      }
+    : {}),
 });
