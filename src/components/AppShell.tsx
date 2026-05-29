@@ -14,11 +14,11 @@ const NAV = [
     { to: "/purchasing", label: "Purchase Engine", icon: ShoppingCart },
   ]},
   { group: "Risk & Sim", items: [
-  { group: "Risk & Sim", items: [
     { to: "/risk", label: "Risk Heatmap", icon: AlertOctagon },
     { to: "/scenarios", label: "Scenario Simulator", icon: FlaskConical },
     { to: "/twin", label: "Digital Twin", icon: Cpu },
   ]},
+  { group: "Intelligence", items: [
     { to: "/copilot", label: "AI Copilot", icon: Sparkles, disabled: true },
     { to: "/war-room", label: "Executive War Room", icon: Radio, disabled: true },
     { to: "/boardroom", label: "Boardroom Mode", icon: Presentation, disabled: true },
