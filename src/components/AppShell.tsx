@@ -58,22 +58,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 const Icon = item.icon;
                 const cls = `flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs transition-colors ${
                   active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                } ${item.disabled ? "opacity-40 cursor-not-allowed" : ""}`;
-                if (item.disabled) {
-                  return (
-                    <div key={item.to} className={cls} title="Coming in a later phase">
-                      <Icon className="w-3.5 h-3.5" />
-                      <span className="truncate">{item.label}</span>
-                      <span className="ml-auto text-[9px] font-mono">SOON</span>
-                    </div>
-                  );
-                }
+                }`;
                 return (
                   <Link key={item.to} to={item.to} className={cls}>
                     <Icon className="w-3.5 h-3.5" />
                     <span className="truncate">{item.label}</span>
                   </Link>
                 );
+
               })}
             </nav>
           </div>
