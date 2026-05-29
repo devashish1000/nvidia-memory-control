@@ -16,6 +16,7 @@ import { Route as RiskRouteImport } from './routes/risk'
 import { Route as PurchasingRouteImport } from './routes/purchasing'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastRouteImport } from './routes/forecast'
+import { Route as DataQualityRouteImport } from './routes/data-quality'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as CaseStudyRouteImport } from './routes/case-study'
@@ -58,6 +59,11 @@ const ForecastRoute = ForecastRouteImport.update({
   path: '/forecast',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DataQualityRoute = DataQualityRouteImport.update({
+  id: '/data-quality',
+  path: '/data-quality',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/case-study': typeof CaseStudyRoute
   '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
+  '/data-quality': typeof DataQualityRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/case-study'
     | '/copilot'
     | '/dashboard'
+    | '/data-quality'
     | '/forecast'
     | '/inventory'
     | '/purchasing'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   CaseStudyRoute: typeof CaseStudyRoute
   CopilotRoute: typeof CopilotRoute
   DashboardRoute: typeof DashboardRoute
+  DataQualityRoute: typeof DataQualityRoute
   ForecastRoute: typeof ForecastRoute
   InventoryRoute: typeof InventoryRoute
   PurchasingRoute: typeof PurchasingRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForecastRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/data-quality': {
+      id: '/data-quality'
+      path: '/data-quality'
+      fullPath: '/data-quality'
+      preLoaderRoute: typeof DataQualityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaseStudyRoute: CaseStudyRoute,
   CopilotRoute: CopilotRoute,
   DashboardRoute: DashboardRoute,
+  DataQualityRoute: DataQualityRoute,
   ForecastRoute: ForecastRoute,
   InventoryRoute: InventoryRoute,
   PurchasingRoute: PurchasingRoute,
@@ -313,3 +334,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
