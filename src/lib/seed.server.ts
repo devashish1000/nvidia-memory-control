@@ -4,7 +4,11 @@
  * Idempotent: clears planning tables before reseeding (ref data preserved if present).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabaseAdmin as _supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Types for new tables aren't generated yet; cast to any for the seed.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db: any = _supabaseAdmin;
 // Deterministic PRNG so re-seeding produces the same dataset.
 function mulberry32(seed: number) {
   return function () {
