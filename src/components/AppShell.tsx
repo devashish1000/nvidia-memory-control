@@ -28,9 +28,8 @@ const NAV = [
     { to: "/tests", label: "Test Center", icon: TestTube },
     { to: "/case-study", label: "Case Study", icon: FileText },
   ]},
-
-  ]},
 ];
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
