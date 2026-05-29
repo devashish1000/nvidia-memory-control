@@ -3,7 +3,6 @@
  * Server-only — imports supabaseAdmin to bypass RLS.
  * Idempotent: clears planning tables before reseeding (ref data preserved if present).
  */
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { supabaseAdmin as _supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // Types for new tables aren't generated yet; cast to any for the seed.

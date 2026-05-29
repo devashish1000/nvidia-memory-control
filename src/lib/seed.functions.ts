@@ -2,9 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { seedDatabase } from "./seed.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db: any = supabaseAdmin;
+
 export const runSeed = createServerFn({ method: "POST" }).handler(async () => {
-  const result = await seedDatabase();
-  return result;
+  return await seedDatabase();
 });
 
 export const getSeedStatus = createServerFn({ method: "GET" }).handler(async () => {
@@ -15,7 +17,7 @@ export const getSeedStatus = createServerFn({ method: "GET" }).handler(async () 
   ];
   const counts: Record<string, number> = {};
   for (const t of tables) {
-    const { count } = await supabaseAdmin.from(t).select("*", { count: "exact", head: true });
+    const { count } = await db.from(t).select("*", { count: "exact", head: true });
     counts[t] = count ?? 0;
   }
   return { counts, isSeeded: (counts.product_families ?? 0) > 0 };
