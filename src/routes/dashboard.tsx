@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, DollarSign, Layers, Database, Loader2, CheckCircle2 } from "lucide-react";
@@ -23,6 +23,7 @@ function Dashboard() {
   const seedStatus = useServerFn(getSeedStatus);
   const seed = useServerFn(runSeed);
   const snapshot = useServerFn(getDashboardSnapshot);
+  const queryClient = useQueryClient();
   const [seeding, setSeeding] = useState(false);
 
   const status = useQuery({ queryKey: ["seed-status"], queryFn: () => seedStatus() });
@@ -32,7 +33,10 @@ function Dashboard() {
     setSeeding(true);
     try {
       await seed();
+      // Refresh this page immediately and invalidate every other page's data
+      // so the whole control tower reflects the new dataset at once.
       await Promise.all([status.refetch(), snap.refetch()]);
+      await queryClient.invalidateQueries();
     } finally {
       setSeeding(false);
     }
