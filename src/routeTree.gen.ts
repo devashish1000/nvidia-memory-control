@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WarRoomRouteImport } from './routes/war-room'
 import { Route as TwinRouteImport } from './routes/twin'
+import { Route as TestsRouteImport } from './routes/tests'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as RiskRouteImport } from './routes/risk'
 import { Route as PurchasingRouteImport } from './routes/purchasing'
@@ -32,6 +33,11 @@ const WarRoomRoute = WarRoomRouteImport.update({
 const TwinRoute = TwinRouteImport.update({
   id: '/twin',
   path: '/twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestsRoute = TestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScenariosRoute = ScenariosRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/purchasing': typeof PurchasingRoute
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
+  '/tests': typeof TestsRoute
   '/twin': typeof TwinRoute
   '/war-room': typeof WarRoomRoute
 }
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   fileRoutesByTo: FileRoutesByTo
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   id:
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/purchasing'
     | '/risk'
     | '/scenarios'
+    | '/tests'
     | '/twin'
     | '/war-room'
   fileRoutesById: FileRoutesById
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   PurchasingRoute: typeof PurchasingRoute
   RiskRoute: typeof RiskRoute
   ScenariosRoute: typeof ScenariosRoute
+  TestsRoute: typeof TestsRoute
   TwinRoute: typeof TwinRoute
   WarRoomRoute: typeof WarRoomRoute
 }
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/twin'
       fullPath: '/twin'
       preLoaderRoute: typeof TwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tests': {
+      id: '/tests'
+      path: '/tests'
+      fullPath: '/tests'
+      preLoaderRoute: typeof TestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scenarios': {
@@ -328,6 +348,7 @@ const rootRouteChildren: RootRouteChildren = {
   PurchasingRoute: PurchasingRoute,
   RiskRoute: RiskRoute,
   ScenariosRoute: ScenariosRoute,
+  TestsRoute: TestsRoute,
   TwinRoute: TwinRoute,
   WarRoomRoute: WarRoomRoute,
 }
