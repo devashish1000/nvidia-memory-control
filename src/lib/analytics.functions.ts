@@ -406,9 +406,9 @@ export const getRiskAnalytics = createServerFn({ method: "GET" }).handler(async 
   const familyById = new Map(core.families.map((f: any) => [f.id, f]));
 
   // Heatmap: category × severity counts
-  const categories = Array.from(new Set(core.risks.map((r: any) => r.category)));
+  const categories = Array.from(new Set((core.risks as any[]).map((r: any) => r.category as string))) as string[];
   const severities = ["low", "medium", "high", "critical"];
-  const heatmap = categories.map((cat: string) => {
+  const heatmap = categories.map((cat) => {
     const row: any = { category: cat };
     for (const s of severities) {
       row[s] = core.risks.filter((r: any) => r.category === cat && r.severity === s).length;
