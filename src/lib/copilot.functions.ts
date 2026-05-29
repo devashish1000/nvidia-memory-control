@@ -128,6 +128,14 @@ SNAPSHOT: ${JSON.stringify(snap)}`;
       messages: [
         { role: "system", content: "You return only valid JSON. No prose, no markdown." },
         { role: "user", content: prompt },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  if (!res.ok) return { ok: false as const, error: `Gateway error (${res.status}).`, snap };
+  const json = await res.json();
+  const content: string = json?.choices?.[0]?.message?.content ?? "{}";
   try {
     const parsed = JSON.parse(content) as {
       headline?: string;
@@ -144,11 +152,5 @@ SNAPSHOT: ${JSON.stringify(snap)}`;
   } catch {
     return { ok: false as const, error: "Could not parse AI response.", snap };
   }
-
-      nextActions: parsed.nextActions ?? [],
-      snap,
-    };
-  } catch {
-    return { ok: false as const, error: "Could not parse AI response.", snap };
-  }
 });
+
