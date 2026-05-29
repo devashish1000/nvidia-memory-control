@@ -9,6 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TwinRouteImport } from './routes/twin'
+import { Route as ScenariosRouteImport } from './routes/scenarios'
+import { Route as RiskRouteImport } from './routes/risk'
 import { Route as PurchasingRouteImport } from './routes/purchasing'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastRouteImport } from './routes/forecast'
@@ -17,6 +20,21 @@ import { Route as CaseStudyRouteImport } from './routes/case-study'
 import { Route as CapacityRouteImport } from './routes/capacity'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TwinRoute = TwinRouteImport.update({
+  id: '/twin',
+  path: '/twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScenariosRoute = ScenariosRouteImport.update({
+  id: '/scenarios',
+  path: '/scenarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RiskRoute = RiskRouteImport.update({
+  id: '/risk',
+  path: '/risk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PurchasingRoute = PurchasingRouteImport.update({
   id: '/purchasing',
   path: '/purchasing',
@@ -61,6 +79,9 @@ export interface FileRoutesByFullPath {
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
+  '/risk': typeof RiskRoute
+  '/scenarios': typeof ScenariosRoute
+  '/twin': typeof TwinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +91,9 @@ export interface FileRoutesByTo {
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
+  '/risk': typeof RiskRoute
+  '/scenarios': typeof ScenariosRoute
+  '/twin': typeof TwinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +104,9 @@ export interface FileRoutesById {
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
   '/purchasing': typeof PurchasingRoute
+  '/risk': typeof RiskRoute
+  '/scenarios': typeof ScenariosRoute
+  '/twin': typeof TwinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +118,9 @@ export interface FileRouteTypes {
     | '/forecast'
     | '/inventory'
     | '/purchasing'
+    | '/risk'
+    | '/scenarios'
+    | '/twin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +130,9 @@ export interface FileRouteTypes {
     | '/forecast'
     | '/inventory'
     | '/purchasing'
+    | '/risk'
+    | '/scenarios'
+    | '/twin'
   id:
     | '__root__'
     | '/'
@@ -109,6 +142,9 @@ export interface FileRouteTypes {
     | '/forecast'
     | '/inventory'
     | '/purchasing'
+    | '/risk'
+    | '/scenarios'
+    | '/twin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +155,34 @@ export interface RootRouteChildren {
   ForecastRoute: typeof ForecastRoute
   InventoryRoute: typeof InventoryRoute
   PurchasingRoute: typeof PurchasingRoute
+  RiskRoute: typeof RiskRoute
+  ScenariosRoute: typeof ScenariosRoute
+  TwinRoute: typeof TwinRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/twin': {
+      id: '/twin'
+      path: '/twin'
+      fullPath: '/twin'
+      preLoaderRoute: typeof TwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scenarios': {
+      id: '/scenarios'
+      path: '/scenarios'
+      fullPath: '/scenarios'
+      preLoaderRoute: typeof ScenariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/risk': {
+      id: '/risk'
+      path: '/risk'
+      fullPath: '/risk'
+      preLoaderRoute: typeof RiskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/purchasing': {
       id: '/purchasing'
       path: '/purchasing'
@@ -183,6 +243,9 @@ const rootRouteChildren: RootRouteChildren = {
   ForecastRoute: ForecastRoute,
   InventoryRoute: InventoryRoute,
   PurchasingRoute: PurchasingRoute,
+  RiskRoute: RiskRoute,
+  ScenariosRoute: ScenariosRoute,
+  TwinRoute: TwinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

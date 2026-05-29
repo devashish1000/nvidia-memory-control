@@ -396,3 +396,141 @@ export const getPurchasingAnalytics = createServerFn({ method: "GET" }).handler(
     },
   } as const;
 });
+
+export const getRiskAnalytics = createServerFn({ method: "GET" }).handler(async () => {
+  const core = await loadCore();
+  if (!core.families.length) return { seeded: false } as const;
+
+  const supplierById = new Map(core.suppliers.map((s: any) => [s.id, s]));
+  const techById = new Map(core.techs.map((t: any) => [t.id, t]));
+  const familyById = new Map(core.families.map((f: any) => [f.id, f]));
+
+  // Heatmap: category × severity counts
+  const categories = Array.from(new Set((core.risks as any[]).map((r: any) => r.category as string))) as string[];
+  const severities = ["low", "medium", "high", "critical"];
+  const heatmap = categories.map((cat) => {
+    const row: any = { category: cat };
+    for (const s of severities) {
+      row[s] = core.risks.filter((r: any) => r.category === cat && r.severity === s).length;
+    }
+    row.total = severities.reduce((acc, s) => acc + row[s], 0);
+    row.revenueAtRisk = core.risks
+      .filter((r: any) => r.category === cat)
+      .reduce((s: number, r: any) => s + num(r.revenue_at_risk), 0);
+    return row;
+  }).sort((a: any, b: any) => b.revenueAtRisk - a.revenueAtRisk);
+
+  // Top risk events
+  const events = core.risks
+    .map((r: any) => {
+      const sup: any = r.supplier_id ? supplierById.get(r.supplier_id) : null;
+      const tech: any = r.memory_technology_id ? techById.get(r.memory_technology_id) : null;
+      const fam: any = r.product_family_id ? familyById.get(r.product_family_id) : null;
+      return {
+        id: r.id,
+        category: r.category,
+        severity: r.severity,
+        status: r.status,
+        description: r.description,
+        supplier: sup?.name ?? "—",
+        tech: tech?.name ?? "—",
+        family: fam?.name ?? "—",
+        revenueAtRisk: num(r.revenue_at_risk),
+        impactUnits: num(r.impact_units),
+        eventDate: r.event_date,
+      };
+    })
+    .sort((a: any, b: any) => b.revenueAtRisk - a.revenueAtRisk);
+
+  // Severity counts
+  const severityCounts = severities.reduce((acc: Record<string, number>, s) => {
+    acc[s] = core.risks.filter((r: any) => r.severity === s).length;
+    return acc;
+  }, {});
+
+  // By supplier
+  const bySupplier: Record<string, { supplier: string; count: number; revenueAtRisk: number }> = {};
+  for (const r of core.risks as any[]) {
+    if (!r.supplier_id) continue;
+    const sup: any = supplierById.get(r.supplier_id);
+    if (!sup) continue;
+    const k = (bySupplier[sup.id] ??= { supplier: sup.name, count: 0, revenueAtRisk: 0 });
+    k.count += 1;
+    k.revenueAtRisk += num(r.revenue_at_risk);
+  }
+  const suppliers = Object.values(bySupplier).sort((a, b) => b.revenueAtRisk - a.revenueAtRisk);
+
+  const totalRevenueAtRisk = core.risks.reduce((s: number, r: any) => s + num(r.revenue_at_risk), 0);
+  const openCount = core.risks.filter((r: any) => r.status === "open").length;
+
+  return {
+    seeded: true,
+    heatmap,
+    events: events.slice(0, 150),
+    severityCounts,
+    suppliers,
+    summary: { total: core.risks.length, open: openCount, totalRevenueAtRisk },
+  } as const;
+});
+
+export const getTwinSnapshot = createServerFn({ method: "GET" }).handler(async () => {
+  const core = await loadCore();
+  if (!core.families.length) return { seeded: false } as const;
+
+  const techById = new Map(core.techs.map((t: any) => [t.id, t]));
+
+  // Suppliers node summary
+  const nodeSuppliers = (core.suppliers as any[]).map((s) => {
+    const cap = (core.capacity as any[])
+      .filter((c) => c.supplier_id === s.id)
+      .reduce((acc, c) => acc + num(c.available_capacity_units), 0);
+    const committed = (core.capacity as any[])
+      .filter((c) => c.supplier_id === s.id)
+      .reduce((acc, c) => acc + num(c.committed_capacity_units), 0);
+    const util = cap > 0 ? committed / cap : 0;
+    return {
+      id: s.id,
+      name: s.name,
+      type: s.supplier_type,
+      region: s.region,
+      risk: num(s.risk_baseline),
+      capacity: cap,
+      utilization: util,
+      status: util > 0.95 ? "critical" : util > 0.85 ? "warning" : "healthy",
+    };
+  });
+
+  const nodeTechs = (core.techs as any[]).map((t) => {
+    const demand = (core.forecasts as any[])
+      .filter((f) => f.memory_technology_id === t.id)
+      .reduce((acc, f) => acc + num(f.forecast_units), 0);
+    const inv = (core.inventory as any[])
+      .filter((i) => i.memory_technology_id === t.id)
+      .reduce((acc, i) => acc + num(i.inventory_units), 0);
+    return { id: t.id, name: t.name, generation: t.generation, demand, inventory: inv };
+  });
+
+  const nodeFamilies = (core.families as any[]).map((f) => ({
+    id: f.id, name: f.name, segment: f.segment,
+  }));
+
+  // Edges: supplier → tech (from capacity rows aggregated)
+  const supplierTechEdges: { source: string; target: string; weight: number }[] = [];
+  const stMap: Record<string, number> = {};
+  for (const c of core.capacity as any[]) {
+    const k = `${c.supplier_id}|${c.memory_technology_id}`;
+    stMap[k] = (stMap[k] ?? 0) + num(c.available_capacity_units);
+  }
+  for (const [k, w] of Object.entries(stMap)) {
+    const [source, target] = k.split("|");
+    supplierTechEdges.push({ source, target, weight: w });
+  }
+
+  return {
+    seeded: true,
+    suppliers: nodeSuppliers,
+    techs: nodeTechs,
+    families: nodeFamilies,
+    edges: supplierTechEdges,
+  } as const;
+});
