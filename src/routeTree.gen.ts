@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WarRoomRouteImport } from './routes/war-room'
 import { Route as TwinRouteImport } from './routes/twin'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as RiskRouteImport } from './routes/risk'
@@ -16,10 +17,17 @@ import { Route as PurchasingRouteImport } from './routes/purchasing'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastRouteImport } from './routes/forecast'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as CaseStudyRouteImport } from './routes/case-study'
 import { Route as CapacityRouteImport } from './routes/capacity'
+import { Route as BoardroomRouteImport } from './routes/boardroom'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WarRoomRoute = WarRoomRouteImport.update({
+  id: '/war-room',
+  path: '/war-room',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TwinRoute = TwinRouteImport.update({
   id: '/twin',
   path: '/twin',
@@ -55,6 +63,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CopilotRoute = CopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CaseStudyRoute = CaseStudyRouteImport.update({
   id: '/case-study',
   path: '/case-study',
@@ -65,6 +78,11 @@ const CapacityRoute = CapacityRouteImport.update({
   path: '/capacity',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoardroomRoute = BoardroomRouteImport.update({
+  id: '/boardroom',
+  path: '/boardroom',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,8 +91,10 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/boardroom': typeof BoardroomRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -82,11 +102,14 @@ export interface FileRoutesByFullPath {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/boardroom': typeof BoardroomRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -94,12 +117,15 @@ export interface FileRoutesByTo {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/boardroom': typeof BoardroomRoute
   '/capacity': typeof CapacityRoute
   '/case-study': typeof CaseStudyRoute
+  '/copilot': typeof CopilotRoute
   '/dashboard': typeof DashboardRoute
   '/forecast': typeof ForecastRoute
   '/inventory': typeof InventoryRoute
@@ -107,13 +133,16 @@ export interface FileRoutesById {
   '/risk': typeof RiskRoute
   '/scenarios': typeof ScenariosRoute
   '/twin': typeof TwinRoute
+  '/war-room': typeof WarRoomRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/boardroom'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -121,11 +150,14 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/boardroom'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -133,11 +165,14 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   id:
     | '__root__'
     | '/'
+    | '/boardroom'
     | '/capacity'
     | '/case-study'
+    | '/copilot'
     | '/dashboard'
     | '/forecast'
     | '/inventory'
@@ -145,12 +180,15 @@ export interface FileRouteTypes {
     | '/risk'
     | '/scenarios'
     | '/twin'
+    | '/war-room'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BoardroomRoute: typeof BoardroomRoute
   CapacityRoute: typeof CapacityRoute
   CaseStudyRoute: typeof CaseStudyRoute
+  CopilotRoute: typeof CopilotRoute
   DashboardRoute: typeof DashboardRoute
   ForecastRoute: typeof ForecastRoute
   InventoryRoute: typeof InventoryRoute
@@ -158,10 +196,18 @@ export interface RootRouteChildren {
   RiskRoute: typeof RiskRoute
   ScenariosRoute: typeof ScenariosRoute
   TwinRoute: typeof TwinRoute
+  WarRoomRoute: typeof WarRoomRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/war-room': {
+      id: '/war-room'
+      path: '/war-room'
+      fullPath: '/war-room'
+      preLoaderRoute: typeof WarRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/twin': {
       id: '/twin'
       path: '/twin'
@@ -211,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/copilot': {
+      id: '/copilot'
+      path: '/copilot'
+      fullPath: '/copilot'
+      preLoaderRoute: typeof CopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/case-study': {
       id: '/case-study'
       path: '/case-study'
@@ -225,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CapacityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boardroom': {
+      id: '/boardroom'
+      path: '/boardroom'
+      fullPath: '/boardroom'
+      preLoaderRoute: typeof BoardroomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,8 +297,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BoardroomRoute: BoardroomRoute,
   CapacityRoute: CapacityRoute,
   CaseStudyRoute: CaseStudyRoute,
+  CopilotRoute: CopilotRoute,
   DashboardRoute: DashboardRoute,
   ForecastRoute: ForecastRoute,
   InventoryRoute: InventoryRoute,
@@ -246,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   RiskRoute: RiskRoute,
   ScenariosRoute: ScenariosRoute,
   TwinRoute: TwinRoute,
+  WarRoomRoute: WarRoomRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
