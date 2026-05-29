@@ -1,9 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
 import {
   Activity, LayoutDashboard, TrendingUp, Factory, Boxes, ShoppingCart,
   AlertOctagon, FlaskConical, Cpu, Sparkles, Radio, Presentation, Shield, TestTube, FileText,
 } from "lucide-react";
 import { ReactNode } from "react";
+
 
 const NAV = [
   { group: "Plan", items: [
